@@ -1,0 +1,45 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum InvoiceStatus {
+  PROCESSING
+  NEEDS_REVIEW
+  APPROVED
+  REJECTED
+}
+
+model Invoice {
+  id                       String        @id @default(cuid())
+  invoiceNumber            String        @unique
+  vendorName               String
+  vendorCategory           String?
+  amount                   Decimal       @db.Decimal(10, 2)
+  currency                 String        @default("USD")
+  invoiceDate              DateTime
+  dueDate                  DateTime
+  status                   InvoiceStatus @default(PROCESSING)
+  description              String?
+  isDuplicate              Boolean       @default(false)
+  duplicateOfInvoiceNumber String?
+  duplicateReason          String?
+  reviewNote               String?
+  reviewedBy               String?
+  reviewedAt               DateTime?
+  lineItems                Json?         // Structured line items: [{ id, description, quantity, unitPrice, total }]
+  auditTrail               Json?         // Audit logs: [{ id, action, fromStatus, toStatus, note, actor, timestamp }]
+  createdAt                DateTime      @default(now())
+  updatedAt                DateTime      @updatedAt
+
+  @@index([status])
+  @@index([vendorName])
+  @@index([isDuplicate])
+}
