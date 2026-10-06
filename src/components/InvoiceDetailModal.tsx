@@ -11,7 +11,6 @@ import {
   Calendar,
   DollarSign,
   FileText,
-  History,
   MessageSquare,
   ShieldAlert,
   Loader2,

@@ -1,6 +1,6 @@
 import React from "react";
 import { InvoicesStats } from "@/types/invoice";
-import { DollarSign, Clock, AlertTriangle, CheckCircle2, Layers } from "lucide-react";
+import { DollarSign, AlertTriangle, CheckCircle2, Layers } from "lucide-react";
 
 interface StatsCardsProps {
   stats: InvoicesStats | null;

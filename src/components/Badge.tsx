@@ -1,6 +1,6 @@
 import React from "react";
 import { InvoiceStatus } from "@/types/invoice";
-import { Clock, AlertCircle, CheckCircle2, XCircle, Copy } from "lucide-react";
+import { Clock, CheckCircle2, XCircle, Copy } from "lucide-react";
 
 interface StatusBadgeProps {
   status: InvoiceStatus;

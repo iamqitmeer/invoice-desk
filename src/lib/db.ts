@@ -14,7 +14,6 @@ const DB_FILE = path.join(DATA_DIR, "invoices.json");
 
 // In-memory fallback / cache for global server lifetime
 declare global {
-  // eslint-disable-next-line no-var
   var __INVOICES_STORE__: Invoice[] | undefined;
 }
 

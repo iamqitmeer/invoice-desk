@@ -1,7 +1,7 @@
 import React from "react";
 import { Invoice } from "@/types/invoice";
 import { StatusBadge } from "./Badge";
-import { X, AlertTriangle, ArrowRight, CheckCircle2, ShieldAlert } from "lucide-react";
+import { X, AlertTriangle, ShieldAlert } from "lucide-react";
 
 interface DuplicateCompareModalProps {
   isOpen: boolean;

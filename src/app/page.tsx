@@ -13,7 +13,7 @@ import { InvoiceTable } from "@/components/InvoiceTable";
 import { InvoiceDetailModal } from "@/components/InvoiceDetailModal";
 import { DuplicateCompareModal } from "@/components/DuplicateCompareModal";
 import { ToastContainer, ToastMessage } from "@/components/Toast";
-import { RefreshCw, Filter, ShieldCheck } from "lucide-react";
+import { RefreshCw } from "lucide-react";
 
 export default function InvoiceDeskPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -50,7 +50,6 @@ export default function InvoiceDeskPage() {
   // Fetch invoices from API
   const fetchInvoices = useCallback(async () => {
     try {
-      setLoading(true);
       const params = new URLSearchParams();
       if (activeTab !== "ALL") {
         params.append("status", activeTab);
@@ -80,8 +79,36 @@ export default function InvoiceDeskPage() {
   }, [activeTab, duplicateFilter, searchQuery, addToast]);
 
   useEffect(() => {
-    fetchInvoices();
-  }, [fetchInvoices]);
+    let isMounted = true;
+    const load = async () => {
+      try {
+        const params = new URLSearchParams();
+        if (activeTab !== "ALL") params.append("status", activeTab);
+        if (duplicateFilter) params.append("duplicateOnly", "true");
+        if (searchQuery.trim()) params.append("search", searchQuery.trim());
+
+        const res = await fetch(`/api/invoices?${params.toString()}`);
+        const data = await res.json();
+
+        if (isMounted && data.success) {
+          setInvoices(data.data);
+          setStats(data.stats);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    load();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [activeTab, duplicateFilter, searchQuery]);
 
   // Update Status handler
   const handleUpdateStatus = async (
@@ -123,7 +150,7 @@ export default function InvoiceDeskPage() {
           setSelectedInvoice(updatedInvoice);
         }
 
-        // If compare modal is open, close or update
+        // If compare modal is open, update
         if (compareData && compareData.duplicate.id === id) {
           setCompareData((prev) =>
             prev ? { ...prev, duplicate: updatedInvoice } : null
@@ -240,7 +267,10 @@ export default function InvoiceDeskPage() {
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={() => fetchInvoices()}
+                onClick={() => {
+                  setLoading(true);
+                  fetchInvoices();
+                }}
                 disabled={loading}
                 title="Refresh queue"
                 className="p-2 rounded-lg border border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 transition-colors cursor-pointer"

@@ -1,13 +1,5 @@
 import React from "react";
-import {
-  FileSpreadsheet,
-  RotateCcw,
-  Sparkles,
-  Database,
-  Search,
-  SlidersHorizontal,
-  Plus,
-} from "lucide-react";
+import { FileSpreadsheet, RotateCcw, Search } from "lucide-react";
 
 interface HeaderProps {
   onResetSeed: () => void;

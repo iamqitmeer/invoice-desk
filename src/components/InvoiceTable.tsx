@@ -1,15 +1,7 @@
 import React from "react";
-import { Invoice, InvoiceStatus } from "@/types/invoice";
+import { Invoice } from "@/types/invoice";
 import { StatusBadge, DuplicateBadge } from "./Badge";
-import {
-  ArrowUpDown,
-  ExternalLink,
-  Check,
-  X,
-  Layers,
-  Inbox,
-  Sparkles,
-} from "lucide-react";
+import { ExternalLink, Check, X, Inbox, Sparkles } from "lucide-react";
 
 interface InvoiceTableProps {
   invoices: Invoice[];
