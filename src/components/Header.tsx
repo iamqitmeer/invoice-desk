@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Search, RotateCcw } from "lucide-react";
 
 interface HeaderProps {
@@ -14,6 +14,23 @@ export function Header({
   searchQuery,
   onSearchChange,
 }: HeaderProps) {
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        e.key === "/" &&
+        document.activeElement?.tagName !== "INPUT" &&
+        document.activeElement?.tagName !== "TEXTAREA"
+      ) {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   return (
     <header className="border-b border-zinc-200/80 bg-white/95 backdrop-blur-md sticky top-0 z-30">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -42,10 +59,11 @@ export function Header({
             <div className="relative flex-1 sm:w-72">
               <Search className="absolute left-3 top-2.5 w-3.5 h-3.5 text-zinc-400" />
               <input
+                ref={searchInputRef}
                 type="text"
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
-                placeholder="Search vendor, invoice #..."
+                placeholder="Search vendor, amount, invoice #..."
                 className="w-full bg-zinc-50 border border-zinc-200/90 rounded-md pl-8 pr-8 py-1.5 text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:bg-white focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400 transition-all font-sans"
               />
               {searchQuery ? (
@@ -57,7 +75,7 @@ export function Header({
                   ✕
                 </button>
               ) : (
-                <span className="absolute right-2.5 top-2 text-[10px] font-mono text-zinc-400 bg-zinc-200/60 px-1 py-0.2 rounded select-none">
+                <span className="absolute right-2.5 top-2 text-[10px] font-mono text-zinc-400 bg-zinc-200/60 px-1 py-0.2 rounded select-none pointer-events-none">
                   /
                 </span>
               )}

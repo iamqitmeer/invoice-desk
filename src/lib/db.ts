@@ -90,7 +90,9 @@ export async function getInvoices(
         inv.invoiceNumber.toLowerCase().includes(q) ||
         inv.vendorName.toLowerCase().includes(q) ||
         inv.description?.toLowerCase().includes(q) ||
-        inv.vendorCategory?.toLowerCase().includes(q)
+        inv.vendorCategory?.toLowerCase().includes(q) ||
+        inv.amount.toString().includes(q) ||
+        inv.currency.toLowerCase().includes(q)
     );
   }
 

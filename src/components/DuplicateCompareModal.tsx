@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Invoice } from "@/types/invoice";
 import { StatusBadge } from "./Badge";
 import { X } from "lucide-react";
@@ -22,6 +22,17 @@ export function DuplicateCompareModal({
   onReject,
   isUpdating,
 }: DuplicateCompareModalProps) {
+  // Close on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen || !duplicateInvoice) return null;
 
   const isAmountMatch =
@@ -32,8 +43,14 @@ export function DuplicateCompareModal({
       originalInvoice.vendorName.toLowerCase();
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-in fade-in duration-150">
-      <div className="relative w-full max-w-3xl max-h-[90vh] flex flex-col rounded-xl border border-zinc-200 bg-white shadow-xl overflow-hidden">
+    <div
+      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/40 backdrop-blur-xs animate-in fade-in duration-150 cursor-default"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-3xl max-h-[90vh] flex flex-col rounded-xl border border-zinc-200 bg-white shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150"
+      >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200 bg-zinc-50/50">
           <div>
@@ -50,6 +67,7 @@ export function DuplicateCompareModal({
           <button
             type="button"
             onClick={onClose}
+            title="Close (Esc)"
             className="p-1 rounded-md text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />

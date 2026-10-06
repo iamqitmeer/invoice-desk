@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { Invoice } from "@/types/invoice";
 import { StatusBadge, DuplicateBadge } from "./Badge";
-import { Check, X, ArrowUpRight } from "lucide-react";
+import { Check, X, ArrowUpRight, Copy, CheckCheck, ArrowUpDown } from "lucide-react";
 
 interface InvoiceTableProps {
   invoices: Invoice[];
@@ -22,6 +22,40 @@ export function InvoiceTable({
   onOpenDuplicateCompare,
   isUpdatingId,
 }: InvoiceTableProps) {
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<"date" | "amount" | "vendor">("date");
+  const [sortAsc, setSortAsc] = useState(false);
+
+  const handleCopy = (id: string, num: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(num);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const handleSort = (field: "date" | "amount" | "vendor") => {
+    if (sortBy === field) {
+      setSortAsc(!sortAsc);
+    } else {
+      setSortBy(field);
+      setSortAsc(false);
+    }
+  };
+
+  const sortedInvoices = [...invoices].sort((a, b) => {
+    if (sortBy === "amount") {
+      return sortAsc ? a.amount - b.amount : b.amount - a.amount;
+    }
+    if (sortBy === "vendor") {
+      return sortAsc
+        ? a.vendorName.localeCompare(b.vendorName)
+        : b.vendorName.localeCompare(a.vendorName);
+    }
+    const timeA = new Date(a.invoiceDate).getTime();
+    const timeB = new Date(b.invoiceDate).getTime();
+    return sortAsc ? timeA - timeB : timeB - timeA;
+  });
+
   if (loading) {
     return (
       <div className="rounded-lg border border-zinc-200/80 bg-white p-6 space-y-3">
@@ -52,23 +86,41 @@ export function InvoiceTable({
     <div className="overflow-hidden rounded-lg border border-zinc-200/80 bg-white shadow-2xs">
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs">
-          {/* Header */}
+          {/* Header with sorting triggers */}
           <thead className="border-b border-zinc-200 bg-zinc-50/75 text-zinc-500 select-none">
             <tr>
               <th className="px-4 py-3 font-mono font-medium uppercase text-[11px] tracking-wider">
                 Invoice
               </th>
-              <th className="px-4 py-3 font-mono font-medium uppercase text-[11px] tracking-wider">
-                Vendor
+              <th
+                onClick={() => handleSort("vendor")}
+                className="px-4 py-3 font-mono font-medium uppercase text-[11px] tracking-wider cursor-pointer hover:text-zinc-900 transition-colors"
+              >
+                <div className="flex items-center gap-1">
+                  <span>Vendor</span>
+                  <ArrowUpDown className="w-3 h-3 text-zinc-400" />
+                </div>
               </th>
               <th className="px-4 py-3 font-mono font-medium uppercase text-[11px] tracking-wider">
                 Category
               </th>
-              <th className="px-4 py-3 font-mono font-medium uppercase text-[11px] tracking-wider text-right">
-                Amount
+              <th
+                onClick={() => handleSort("amount")}
+                className="px-4 py-3 font-mono font-medium uppercase text-[11px] tracking-wider text-right cursor-pointer hover:text-zinc-900 transition-colors"
+              >
+                <div className="flex items-center justify-end gap-1">
+                  <span>Amount</span>
+                  <ArrowUpDown className="w-3 h-3 text-zinc-400" />
+                </div>
               </th>
-              <th className="px-4 py-3 font-mono font-medium uppercase text-[11px] tracking-wider">
-                Billing Date
+              <th
+                onClick={() => handleSort("date")}
+                className="px-4 py-3 font-mono font-medium uppercase text-[11px] tracking-wider cursor-pointer hover:text-zinc-900 transition-colors"
+              >
+                <div className="flex items-center gap-1">
+                  <span>Billing Date</span>
+                  <ArrowUpDown className="w-3 h-3 text-zinc-400" />
+                </div>
               </th>
               <th className="px-4 py-3 font-mono font-medium uppercase text-[11px] tracking-wider">
                 Status
@@ -81,8 +133,9 @@ export function InvoiceTable({
 
           {/* Body */}
           <tbody className="divide-y divide-zinc-100 text-zinc-800">
-            {invoices.map((inv) => {
+            {sortedInvoices.map((inv) => {
               const isUpdating = isUpdatingId === inv.id;
+              const isCopied = copiedId === inv.id;
 
               return (
                 <tr
@@ -93,9 +146,19 @@ export function InvoiceTable({
                   {/* Invoice # & Duplicate Flag */}
                   <td className="px-4 py-3.5 whitespace-nowrap">
                     <div className="flex items-center gap-2">
-                      <span className="font-mono font-semibold text-zinc-950">
-                        {inv.invoiceNumber}
-                      </span>
+                      <button
+                        type="button"
+                        onClick={(e) => handleCopy(inv.id, inv.invoiceNumber, e)}
+                        title="Copy invoice ID"
+                        className="group/copy flex items-center gap-1 font-mono font-semibold text-zinc-950 hover:text-blue-600 transition-colors cursor-pointer"
+                      >
+                        <span>{inv.invoiceNumber}</span>
+                        {isCopied ? (
+                          <CheckCheck className="w-3 h-3 text-emerald-600" />
+                        ) : (
+                          <Copy className="w-3 h-3 text-zinc-300 opacity-0 group-hover/copy:opacity-100 transition-opacity" />
+                        )}
+                      </button>
                       {inv.isDuplicate && (
                         <DuplicateBadge
                           referenceId={inv.duplicateOfInvoiceNumber}

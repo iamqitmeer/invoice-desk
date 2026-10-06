@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Invoice, InvoiceStatus } from "@/types/invoice";
 import { StatusBadge, DuplicateBadge } from "./Badge";
-import { X, Loader2, ArrowRight } from "lucide-react";
+import { X, Loader2, ArrowRight, Copy, Check } from "lucide-react";
 
 interface InvoiceDetailModalProps {
   invoice: Invoice | null;
@@ -26,6 +26,18 @@ export function InvoiceDetailModal({
 }: InvoiceDetailModalProps) {
   const [note, setNote] = useState("");
   const [activeTab, setActiveTab] = useState<"details" | "audit">("details");
+  const [copied, setCopied] = useState(false);
+
+  // Close on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen || !invoice) return null;
 
@@ -34,15 +46,38 @@ export function InvoiceDetailModal({
     setNote("");
   };
 
+  const handleCopy = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(invoice.invoiceNumber);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-in fade-in duration-150">
-      <div className="relative w-full max-w-2xl max-h-[90vh] flex flex-col rounded-xl border border-zinc-200 bg-white shadow-xl overflow-hidden">
+    <div
+      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/40 backdrop-blur-xs animate-in fade-in duration-150 cursor-default"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-2xl max-h-[90vh] flex flex-col rounded-xl border border-zinc-200 bg-white shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150"
+      >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200 bg-zinc-50/50">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200 bg-zinc-50/75">
           <div className="flex items-center gap-3">
-            <span className="font-mono font-bold text-base text-zinc-950">
-              {invoice.invoiceNumber}
-            </span>
+            <button
+              type="button"
+              onClick={handleCopy}
+              title="Click to copy invoice number"
+              className="group flex items-center gap-1.5 font-mono font-bold text-base text-zinc-950 hover:text-blue-600 transition-colors cursor-pointer"
+            >
+              <span>{invoice.invoiceNumber}</span>
+              {copied ? (
+                <Check className="w-3.5 h-3.5 text-emerald-600" />
+              ) : (
+                <Copy className="w-3.5 h-3.5 text-zinc-400 group-hover:text-blue-600 transition-colors" />
+              )}
+            </button>
             <StatusBadge status={invoice.status} />
             {invoice.isDuplicate && (
               <DuplicateBadge
@@ -54,6 +89,7 @@ export function InvoiceDetailModal({
           <button
             type="button"
             onClick={onClose}
+            title="Close (Esc)"
             className="p-1 rounded-md text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
