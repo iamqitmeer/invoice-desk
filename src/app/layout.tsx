@@ -4,12 +4,11 @@ import "./globals.css";
 
 const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-inter",
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Invoice Approval Desk | Sledge",
+  title: "Invoice Approval Desk",
   description: "Internal invoice review and approval workflow system",
 };
 
@@ -19,8 +18,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col font-sans bg-zinc-50 text-zinc-900">
+    <html lang="en" className="h-full antialiased">
+      <body className={`${inter.className} min-h-full flex flex-col bg-[#fafafa] text-zinc-900`}>
         {children}
       </body>
     </html>

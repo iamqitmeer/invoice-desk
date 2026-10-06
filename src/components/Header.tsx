@@ -21,16 +21,16 @@ export function Header({
           {/* Logo & System Badge */}
           <div className="flex items-center gap-3">
             <div className="flex items-center justify-center w-8 h-8 rounded-md bg-zinc-950 text-white font-bold text-xs tracking-wider shadow-xs">
-              SL
+              ID
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-sm font-semibold text-zinc-950 tracking-tight">
-                  Sledge Desk
+                  Invoice Approval Desk
                 </span>
-                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-zinc-100 text-zinc-600 border border-zinc-200">
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-zinc-100 text-zinc-600 border border-zinc-200">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                  v1.0-live
+                  Finance Portal
                 </span>
               </div>
             </div>

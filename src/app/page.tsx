@@ -80,30 +80,24 @@ export default function InvoiceDeskPage() {
 
   useEffect(() => {
     let isMounted = true;
-    const load = async () => {
-      try {
-        const params = new URLSearchParams();
-        if (activeTab !== "ALL") params.append("status", activeTab);
-        if (duplicateFilter) params.append("duplicateOnly", "true");
-        if (searchQuery.trim()) params.append("search", searchQuery.trim());
+    const params = new URLSearchParams();
+    if (activeTab !== "ALL") params.append("status", activeTab);
+    if (duplicateFilter) params.append("duplicateOnly", "true");
+    if (searchQuery.trim()) params.append("search", searchQuery.trim());
 
-        const res = await fetch(`/api/invoices?${params.toString()}`);
-        const data = await res.json();
-
+    fetch(`/api/invoices?${params.toString()}`)
+      .then((res) => res.json())
+      .then((data) => {
         if (isMounted && data.success) {
           setInvoices(data.data);
           setStats(data.stats);
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        if (isMounted) {
           setLoading(false);
         }
-      }
-    };
-
-    load();
+      })
+      .catch((err) => {
+        console.error(err);
+        if (isMounted) setLoading(false);
+      });
 
     return () => {
       isMounted = false;
@@ -126,7 +120,7 @@ export default function InvoiceDeskPage() {
         body: JSON.stringify({
           status: newStatus,
           reviewNote: reviewNote || undefined,
-          reviewedBy: "Sledge Operations Lead",
+          reviewedBy: "Operations Lead",
         }),
       });
 
@@ -290,13 +284,13 @@ export default function InvoiceDeskPage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-zinc-200/80 bg-white py-5 mt-auto">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-zinc-400">
-          <div className="flex items-center gap-2 font-mono text-[11px]">
+      <footer className="border-t border-zinc-200/80 bg-white py-4 mt-auto">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-zinc-400 font-mono text-[11px]">
+          <div className="flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-            <span>Sledge Desk • TypeScript API + Database Status Persistence</span>
+            <span>Invoice Approval Desk</span>
           </div>
-          <div className="text-[11px]">Submission by Muhammad Qitmeer</div>
+          <div>Internal Financial Controls</div>
         </div>
       </footer>
 
