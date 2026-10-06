@@ -1,7 +1,7 @@
 import React from "react";
 import { Invoice } from "@/types/invoice";
 import { StatusBadge } from "./Badge";
-import { X, AlertTriangle, ShieldAlert } from "lucide-react";
+import { X } from "lucide-react";
 
 interface DuplicateCompareModalProps {
   isOpen: boolean;
@@ -24,106 +24,69 @@ export function DuplicateCompareModal({
 }: DuplicateCompareModalProps) {
   if (!isOpen || !duplicateInvoice) return null;
 
-  const isAmountMatch =
-    originalInvoice && duplicateInvoice.amount === originalInvoice.amount;
-  const isVendorMatch =
-    originalInvoice &&
-    duplicateInvoice.vendorName.toLowerCase() ===
-      originalInvoice.vendorName.toLowerCase();
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="relative w-full max-w-4xl max-h-[90vh] flex flex-col rounded-2xl border border-orange-500/30 bg-zinc-950 shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
+      <div className="relative w-full max-w-3xl max-h-[90vh] flex flex-col rounded-xl border border-zinc-200 bg-white shadow-xl overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800 bg-orange-950/20">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-orange-500/20 text-orange-400 border border-orange-500/30">
-              <ShieldAlert className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="text-base font-semibold text-zinc-100 flex items-center gap-2">
-                Duplicate Anomaly Comparison
-                <span className="text-xs px-2 py-0.5 rounded bg-orange-500/20 text-orange-300 font-normal">
-                  Risk Level: High
-                </span>
-              </h3>
-              <p className="text-xs text-zinc-400">
-                Comparing flagged invoice against previously registered billing statement
-              </p>
-            </div>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200">
+          <div>
+            <h3 className="text-sm font-semibold text-zinc-900">
+              Duplicate Comparison
+            </h3>
+            <p className="text-xs text-zinc-500 mt-0.5">
+              Compare flagged invoice against existing billing record
+            </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/60 transition-colors"
+            className="p-1 rounded text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Warning Banner */}
-        <div className="px-6 py-3 bg-amber-500/10 border-b border-amber-500/20 text-xs text-amber-200 flex items-start gap-2.5">
-          <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-          <div>
-            <span className="font-semibold">Detection Reason: </span>
-            {duplicateInvoice.duplicateReason ||
-              "Identical amount and vendor matching previous invoice within billing cycle."}
-          </div>
+        {/* Warning Note */}
+        <div className="px-6 py-2.5 bg-amber-50 border-b border-amber-200 text-xs text-amber-900">
+          <span className="font-semibold">Reason: </span>
+          {duplicateInvoice.duplicateReason || "Matches previous invoice record."}
         </div>
 
-        {/* Content Side by Side */}
-        <div className="flex-1 overflow-y-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Side-by-Side Comparison */}
+        <div className="flex-1 overflow-y-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
           {/* Flagged Invoice */}
-          <div className="rounded-xl border border-orange-500/30 bg-zinc-900/60 p-5 flex flex-col justify-between">
+          <div className="rounded-lg border border-orange-200 bg-orange-50/20 p-4 flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between pb-3 border-b border-zinc-800">
+              <div className="flex items-center justify-between pb-2 border-b border-zinc-200">
                 <div>
-                  <span className="text-xs font-semibold uppercase text-orange-400">
-                    Flagged New Submission
+                  <span className="text-[11px] font-semibold text-orange-700 uppercase">
+                    New Flagged Submission
                   </span>
-                  <h4 className="text-lg font-bold text-zinc-100 mt-0.5">
+                  <div className="text-base font-bold text-zinc-900 mt-0.5">
                     {duplicateInvoice.invoiceNumber}
-                  </h4>
+                  </div>
                 </div>
                 <StatusBadge status={duplicateInvoice.status} />
               </div>
 
-              <div className="mt-4 space-y-3.5 text-sm">
+              <div className="mt-3 space-y-2.5">
                 <div>
-                  <div className="text-xs text-zinc-400 font-medium">Vendor Name</div>
-                  <div
-                    className={`font-semibold mt-0.5 ${
-                      isVendorMatch ? "text-amber-300 flex items-center gap-1.5" : "text-zinc-100"
-                    }`}
-                  >
+                  <div className="text-zinc-400">Vendor</div>
+                  <div className="font-semibold text-zinc-900">
                     {duplicateInvoice.vendorName}
-                    {isVendorMatch && (
-                      <span className="text-[10px] px-1.5 py-0.2 bg-amber-500/20 text-amber-300 rounded font-normal">
-                        Matches Original
-                      </span>
-                    )}
                   </div>
                 </div>
 
                 <div>
-                  <div className="text-xs text-zinc-400 font-medium">Total Amount</div>
-                  <div
-                    className={`text-xl font-bold mt-0.5 ${
-                      isAmountMatch ? "text-orange-300 flex items-center gap-1.5" : "text-zinc-100"
-                    }`}
-                  >
+                  <div className="text-zinc-400">Amount</div>
+                  <div className="font-semibold text-zinc-900 text-sm">
                     ${duplicateInvoice.amount.toFixed(2)} {duplicateInvoice.currency}
-                    {isAmountMatch && (
-                      <span className="text-[10px] px-1.5 py-0.2 bg-orange-500/20 text-orange-300 rounded font-normal">
-                        Exact Amount Match
-                      </span>
-                    )}
                   </div>
                 </div>
 
                 <div>
-                  <div className="text-xs text-zinc-400 font-medium">Invoice Date</div>
-                  <div className="text-zinc-200 mt-0.5">
+                  <div className="text-zinc-400">Date</div>
+                  <div className="text-zinc-700">
                     {new Date(duplicateInvoice.invoiceDate).toLocaleDateString("en-US", {
                       year: "numeric",
                       month: "short",
@@ -133,90 +96,68 @@ export function DuplicateCompareModal({
                 </div>
 
                 <div>
-                  <div className="text-xs text-zinc-400 font-medium">Description</div>
-                  <div className="text-zinc-300 text-xs mt-0.5 leading-relaxed bg-zinc-950/60 p-2.5 rounded-lg border border-zinc-800">
-                    {duplicateInvoice.description || "No description provided."}
+                  <div className="text-zinc-400">Description</div>
+                  <div className="text-zinc-600 mt-0.5">
+                    {duplicateInvoice.description || "—"}
                   </div>
                 </div>
-
-                {duplicateInvoice.lineItems && (
-                  <div>
-                    <div className="text-xs text-zinc-400 font-medium mb-1.5">Line Items</div>
-                    <div className="space-y-1.5">
-                      {duplicateInvoice.lineItems.map((item) => (
-                        <div
-                          key={item.id}
-                          className="flex justify-between text-xs bg-zinc-950/40 p-2 rounded border border-zinc-800/80"
-                        >
-                          <span className="text-zinc-300 truncate max-w-[200px]">
-                            {item.description}
-                          </span>
-                          <span className="font-semibold text-zinc-200">
-                            ${item.total.toFixed(2)}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
 
-            {/* Quick Actions for Duplicate */}
-            <div className="mt-6 pt-4 border-t border-zinc-800 flex items-center gap-2">
+            <div className="mt-5 pt-3 border-t border-zinc-200 flex items-center gap-2">
               <button
                 type="button"
                 disabled={isUpdating || duplicateInvoice.status === "REJECTED"}
                 onClick={() => onReject(duplicateInvoice.id)}
-                className="flex-1 px-3 py-2 rounded-lg text-xs font-semibold bg-rose-600 hover:bg-rose-500 text-white transition-colors disabled:opacity-50 cursor-pointer text-center"
+                className="flex-1 px-3 py-1.5 rounded-md text-xs font-medium bg-rose-600 hover:bg-rose-700 text-white transition-colors disabled:opacity-50 cursor-pointer"
               >
-                Reject As Duplicate
+                Reject Duplicate
               </button>
               <button
                 type="button"
                 disabled={isUpdating || duplicateInvoice.status === "APPROVED"}
                 onClick={() => onApprove(duplicateInvoice.id)}
-                className="px-3 py-2 rounded-lg text-xs font-semibold bg-zinc-800 hover:bg-zinc-700 text-zinc-200 transition-colors disabled:opacity-50 cursor-pointer"
+                className="px-3 py-1.5 rounded-md text-xs font-medium border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50 transition-colors disabled:opacity-50 cursor-pointer"
               >
                 Approve Anyway
               </button>
             </div>
           </div>
 
-          {/* Original Existing Invoice */}
-          <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 flex flex-col justify-between">
+          {/* Original Record */}
+          <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4 flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between pb-3 border-b border-zinc-800">
+              <div className="flex items-center justify-between pb-2 border-b border-zinc-200">
                 <div>
-                  <span className="text-xs font-semibold uppercase text-zinc-400">
-                    Original Existing Invoice
+                  <span className="text-[11px] font-semibold text-zinc-500 uppercase">
+                    Original In Database
                   </span>
-                  <h4 className="text-lg font-bold text-zinc-100 mt-0.5">
-                    {originalInvoice ? originalInvoice.invoiceNumber : duplicateInvoice.duplicateOfInvoiceNumber || "INV-2024-001"}
-                  </h4>
+                  <div className="text-base font-bold text-zinc-900 mt-0.5">
+                    {originalInvoice ? originalInvoice.invoiceNumber : duplicateInvoice.duplicateOfInvoiceNumber}
+                  </div>
                 </div>
                 {originalInvoice && <StatusBadge status={originalInvoice.status} />}
               </div>
 
               {originalInvoice ? (
-                <div className="mt-4 space-y-3.5 text-sm">
+                <div className="mt-3 space-y-2.5">
                   <div>
-                    <div className="text-xs text-zinc-400 font-medium">Vendor Name</div>
-                    <div className="font-semibold text-zinc-100 mt-0.5">
+                    <div className="text-zinc-400">Vendor</div>
+                    <div className="font-semibold text-zinc-900">
                       {originalInvoice.vendorName}
                     </div>
                   </div>
 
                   <div>
-                    <div className="text-xs text-zinc-400 font-medium">Total Amount</div>
-                    <div className="text-xl font-bold text-zinc-100 mt-0.5">
+                    <div className="text-zinc-400">Amount</div>
+                    <div className="font-semibold text-zinc-900 text-sm">
                       ${originalInvoice.amount.toFixed(2)} {originalInvoice.currency}
                     </div>
                   </div>
 
                   <div>
-                    <div className="text-xs text-zinc-400 font-medium">Invoice Date</div>
-                    <div className="text-zinc-200 mt-0.5">
+                    <div className="text-zinc-400">Date</div>
+                    <div className="text-zinc-700">
                       {new Date(originalInvoice.invoiceDate).toLocaleDateString("en-US", {
                         year: "numeric",
                         month: "short",
@@ -226,55 +167,33 @@ export function DuplicateCompareModal({
                   </div>
 
                   <div>
-                    <div className="text-xs text-zinc-400 font-medium">Description</div>
-                    <div className="text-zinc-300 text-xs mt-0.5 leading-relaxed bg-zinc-950/60 p-2.5 rounded-lg border border-zinc-800">
-                      {originalInvoice.description || "No description provided."}
+                    <div className="text-zinc-400">Description</div>
+                    <div className="text-zinc-600 mt-0.5">
+                      {originalInvoice.description || "—"}
                     </div>
                   </div>
-
-                  {originalInvoice.lineItems && (
-                    <div>
-                      <div className="text-xs text-zinc-400 font-medium mb-1.5">Line Items</div>
-                      <div className="space-y-1.5">
-                        {originalInvoice.lineItems.map((item) => (
-                          <div
-                            key={item.id}
-                            className="flex justify-between text-xs bg-zinc-950/40 p-2 rounded border border-zinc-800/80"
-                          >
-                            <span className="text-zinc-300 truncate max-w-[200px]">
-                              {item.description}
-                            </span>
-                            <span className="font-semibold text-zinc-200">
-                              ${item.total.toFixed(2)}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </div>
               ) : (
-                <div className="mt-8 text-center py-10 text-xs text-zinc-500">
-                  Original invoice records loaded via reference ID:{" "}
-                  {duplicateInvoice.duplicateOfInvoiceNumber}
+                <div className="mt-6 text-center text-zinc-400">
+                  Original invoice loaded via reference ID
                 </div>
               )}
             </div>
 
-            <div className="mt-6 pt-4 border-t border-zinc-800 text-xs text-zinc-500 text-center">
-              Historical reference record (read-only)
+            <div className="mt-5 pt-3 border-t border-zinc-200 text-[11px] text-zinc-400 text-center">
+              Historical reference (read-only)
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3 border-t border-zinc-800 bg-zinc-900/80 flex items-center justify-end">
+        <div className="px-6 py-3 border-t border-zinc-200 bg-zinc-50 flex justify-end">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-lg text-xs font-medium text-zinc-300 hover:text-white bg-zinc-800 hover:bg-zinc-700 transition-colors cursor-pointer"
+            className="px-3.5 py-1.5 rounded-md text-xs font-medium border border-zinc-200 bg-white hover:bg-zinc-100 text-zinc-700 transition-colors cursor-pointer"
           >
-            Close Comparison
+            Close
           </button>
         </div>
       </div>

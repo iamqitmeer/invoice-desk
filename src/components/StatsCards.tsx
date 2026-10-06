@@ -1,6 +1,5 @@
 import React from "react";
 import { InvoicesStats } from "@/types/invoice";
-import { DollarSign, AlertTriangle, CheckCircle2, Layers } from "lucide-react";
 
 interface StatsCardsProps {
   stats: InvoicesStats | null;
@@ -10,89 +9,57 @@ interface StatsCardsProps {
 export function StatsCards({ stats, loading }: StatsCardsProps) {
   if (loading || !stats) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className="h-24 rounded-xl border border-zinc-800/80 bg-zinc-900/40 animate-pulse p-4"
+            className="h-20 rounded-lg border border-zinc-200 bg-white p-3.5 animate-pulse"
           />
         ))}
       </div>
     );
   }
 
-  const cards = [
+  const items = [
     {
-      label: "Pending Review Amount",
+      label: "Pending Amount",
       value: `$${stats.totalPendingAmount.toLocaleString("en-US", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       })}`,
-      subtitle: `${stats.processing + stats.needsReview} invoices awaiting approval`,
-      icon: DollarSign,
-      iconColor: "text-blue-400",
-      bgColor: "bg-blue-500/10",
-      borderColor: "border-blue-500/20",
+      detail: `${stats.processing + stats.needsReview} pending review`,
     },
     {
       label: "Needs Review",
       value: stats.needsReview.toString(),
-      subtitle: "Requires human authorization",
-      icon: AlertTriangle,
-      iconColor: "text-amber-400",
-      bgColor: "bg-amber-500/10",
-      borderColor: "border-amber-500/20",
+      detail: "Requires decision",
     },
     {
-      label: "Approved & Resolved",
-      value: `${stats.approved} / ${stats.total}`,
-      subtitle: `${stats.rejected} rejected / filtered`,
-      icon: CheckCircle2,
-      iconColor: "text-emerald-400",
-      bgColor: "bg-emerald-500/10",
-      borderColor: "border-emerald-500/20",
+      label: "Approved",
+      value: stats.approved.toString(),
+      detail: `${stats.rejected} rejected`,
     },
     {
-      label: "Duplicate Anomaly Alerts",
+      label: "Duplicates Flagged",
       value: stats.duplicateCount.toString(),
-      subtitle: "Similarity rule triggered",
-      icon: Layers,
-      iconColor: "text-orange-400",
-      bgColor: "bg-orange-500/10",
-      borderColor: "border-orange-500/20",
+      detail: "Potential duplicate",
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      {cards.map((card, idx) => {
-        const Icon = card.icon;
-        return (
-          <div
-            key={idx}
-            className="relative overflow-hidden rounded-xl border border-zinc-800/80 bg-zinc-900/60 p-4 backdrop-blur-sm transition-all hover:border-zinc-700/80"
-          >
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-zinc-400 uppercase tracking-wider">
-                {card.label}
-              </span>
-              <div
-                className={`p-2 rounded-lg ${card.bgColor} ${card.borderColor} border`}
-              >
-                <Icon className={`w-4 h-4 ${card.iconColor}`} />
-              </div>
-            </div>
-            <div className="mt-2">
-              <div className="text-2xl font-bold text-zinc-100 tracking-tight">
-                {card.value}
-              </div>
-              <div className="text-xs text-zinc-400 mt-0.5">
-                {card.subtitle}
-              </div>
-            </div>
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      {items.map((item, idx) => (
+        <div
+          key={idx}
+          className="rounded-lg border border-zinc-200 bg-white p-3.5 shadow-xs"
+        >
+          <div className="text-xs font-medium text-zinc-500">{item.label}</div>
+          <div className="text-xl font-semibold text-zinc-900 mt-1 tracking-tight">
+            {item.value}
           </div>
-        );
-      })}
+          <div className="text-[11px] text-zinc-400 mt-0.5">{item.detail}</div>
+        </div>
+      ))}
     </div>
   );
 }
