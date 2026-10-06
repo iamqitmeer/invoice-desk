@@ -27,9 +27,9 @@ export function TabNav({
   ];
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-200">
-      {/* Clean Tab List */}
-      <div className="flex items-center gap-1 overflow-x-auto -mb-px">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
+      {/* Segmented Control Pill Container */}
+      <div className="inline-flex p-1 rounded-lg bg-zinc-100/90 border border-zinc-200/80 overflow-x-auto">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.key;
           return (
@@ -37,18 +37,18 @@ export function TabNav({
               key={tab.key}
               type="button"
               onClick={() => onTabChange(tab.key)}
-              className={`flex items-center gap-2 px-3 py-2.5 text-xs font-medium border-b-2 transition-colors cursor-pointer whitespace-nowrap ${
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium transition-all cursor-pointer whitespace-nowrap ${
                 isActive
-                  ? "border-zinc-900 text-zinc-900 font-semibold"
-                  : "border-transparent text-zinc-500 hover:text-zinc-800 hover:border-zinc-300"
+                  ? "bg-white text-zinc-950 font-semibold shadow-2xs border border-zinc-200/60"
+                  : "text-zinc-600 hover:text-zinc-950 hover:bg-zinc-200/50 border border-transparent"
               }`}
             >
               <span>{tab.label}</span>
               <span
-                className={`px-1.5 py-0.2 rounded text-[11px] ${
+                className={`px-1.5 py-0.2 rounded-sm text-[10px] font-mono ${
                   isActive
                     ? "bg-zinc-100 text-zinc-900 font-semibold"
-                    : "bg-zinc-100 text-zinc-500"
+                    : "bg-zinc-200/60 text-zinc-500"
                 }`}
               >
                 {tab.count}
@@ -58,17 +58,35 @@ export function TabNav({
         })}
       </div>
 
-      {/* Duplicate Filter */}
-      <div className="flex items-center gap-2 pb-2 sm:pb-0">
-        <label className="flex items-center gap-2 text-xs font-medium text-zinc-600 cursor-pointer select-none">
-          <input
-            type="checkbox"
-            checked={duplicateFilter}
-            onChange={onToggleDuplicateFilter}
-            className="rounded border-zinc-300 text-zinc-900 focus:ring-zinc-900 cursor-pointer"
+      {/* Duplicate Filter Pill */}
+      <div className="flex items-center gap-2 self-end sm:self-auto">
+        <button
+          type="button"
+          onClick={onToggleDuplicateFilter}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all cursor-pointer border ${
+            duplicateFilter
+              ? "bg-orange-50 border-orange-200 text-orange-900 font-semibold shadow-2xs"
+              : "bg-white border-zinc-200 text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900"
+          }`}
+        >
+          <span
+            className={`w-1.5 h-1.5 rounded-full ${
+              duplicateFilter ? "bg-orange-500" : "bg-zinc-400"
+            }`}
           />
-          <span>Duplicates only</span>
-        </label>
+          <span>Duplicates Only</span>
+          {stats && stats.duplicateCount > 0 && (
+            <span
+              className={`px-1.5 py-0.2 rounded text-[10px] font-mono ${
+                duplicateFilter
+                  ? "bg-orange-200/60 text-orange-950 font-bold"
+                  : "bg-zinc-100 text-zinc-500"
+              }`}
+            >
+              {stats.duplicateCount}
+            </span>
+          )}
+        </button>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import React from "react";
 import { Invoice } from "@/types/invoice";
 import { StatusBadge, DuplicateBadge } from "./Badge";
+import { Check, X, ArrowUpRight } from "lucide-react";
 
 interface InvoiceTableProps {
   invoices: Invoice[];
@@ -23,9 +24,9 @@ export function InvoiceTable({
 }: InvoiceTableProps) {
   if (loading) {
     return (
-      <div className="rounded-lg border border-zinc-200 bg-white p-6 space-y-3">
-        {[1, 2, 3, 4, 5].map((i) => (
-          <div key={i} className="h-10 rounded bg-zinc-100 animate-pulse w-full" />
+      <div className="rounded-lg border border-zinc-200/80 bg-white p-6 space-y-3">
+        {[1, 2, 3, 4, 5, 6].map((i) => (
+          <div key={i} className="h-11 rounded bg-zinc-100 animate-pulse w-full" />
         ))}
       </div>
     );
@@ -33,34 +34,53 @@ export function InvoiceTable({
 
   if (invoices.length === 0) {
     return (
-      <div className="rounded-lg border border-zinc-200 bg-white p-12 text-center">
-        <h3 className="text-sm font-medium text-zinc-900">No invoices found</h3>
+      <div className="rounded-lg border border-zinc-200/80 bg-white p-12 text-center">
+        <div className="w-10 h-10 rounded-full bg-zinc-100 text-zinc-400 mx-auto flex items-center justify-center font-mono text-xs">
+          00
+        </div>
+        <h3 className="text-sm font-semibold text-zinc-900 mt-3">
+          No invoices match filters
+        </h3>
         <p className="text-xs text-zinc-500 mt-1">
-          Try clearing search or switching to another tab.
+          Adjust your active filter tab or clear your search query.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-xs">
+    <div className="overflow-hidden rounded-lg border border-zinc-200/80 bg-white shadow-2xs">
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs">
-          {/* Table Header */}
-          <thead className="border-b border-zinc-200 bg-zinc-50 text-zinc-500 select-none">
+          {/* Header */}
+          <thead className="border-b border-zinc-200 bg-zinc-50/75 text-zinc-500 select-none">
             <tr>
-              <th className="px-4 py-3 font-medium">Invoice</th>
-              <th className="px-4 py-3 font-medium">Vendor</th>
-              <th className="px-4 py-3 font-medium">Description</th>
-              <th className="px-4 py-3 font-medium text-right">Amount</th>
-              <th className="px-4 py-3 font-medium">Date</th>
-              <th className="px-4 py-3 font-medium">Status</th>
-              <th className="px-4 py-3 font-medium text-right">Action</th>
+              <th className="px-4 py-3 font-mono font-medium uppercase text-[11px] tracking-wider">
+                Invoice
+              </th>
+              <th className="px-4 py-3 font-mono font-medium uppercase text-[11px] tracking-wider">
+                Vendor
+              </th>
+              <th className="px-4 py-3 font-mono font-medium uppercase text-[11px] tracking-wider">
+                Category
+              </th>
+              <th className="px-4 py-3 font-mono font-medium uppercase text-[11px] tracking-wider text-right">
+                Amount
+              </th>
+              <th className="px-4 py-3 font-mono font-medium uppercase text-[11px] tracking-wider">
+                Billing Date
+              </th>
+              <th className="px-4 py-3 font-mono font-medium uppercase text-[11px] tracking-wider">
+                Status
+              </th>
+              <th className="px-4 py-3 font-mono font-medium uppercase text-[11px] tracking-wider text-right">
+                Quick Actions
+              </th>
             </tr>
           </thead>
 
-          {/* Table Body */}
-          <tbody className="divide-y divide-zinc-200 text-zinc-700">
+          {/* Body */}
+          <tbody className="divide-y divide-zinc-100 text-zinc-800">
             {invoices.map((inv) => {
               const isUpdating = isUpdatingId === inv.id;
 
@@ -68,16 +88,17 @@ export function InvoiceTable({
                 <tr
                   key={inv.id}
                   onClick={() => onSelectInvoice(inv)}
-                  className="hover:bg-zinc-50/80 transition-colors cursor-pointer"
+                  className="group hover:bg-zinc-50/80 transition-colors cursor-pointer"
                 >
-                  {/* Invoice Number & Duplicate Badge */}
+                  {/* Invoice # & Duplicate Flag */}
                   <td className="px-4 py-3.5 whitespace-nowrap">
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold text-zinc-900">
+                      <span className="font-mono font-semibold text-zinc-950">
                         {inv.invoiceNumber}
                       </span>
                       {inv.isDuplicate && (
                         <DuplicateBadge
+                          referenceId={inv.duplicateOfInvoiceNumber}
                           onCompareClick={() => onOpenDuplicateCompare(inv)}
                         />
                       )}
@@ -86,27 +107,33 @@ export function InvoiceTable({
 
                   {/* Vendor */}
                   <td className="px-4 py-3.5 whitespace-nowrap">
-                    <div className="font-medium text-zinc-900">{inv.vendorName}</div>
-                    <div className="text-[11px] text-zinc-400">
-                      {inv.vendorCategory || "Expense"}
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-6 h-6 rounded bg-zinc-100 border border-zinc-200 flex items-center justify-center font-bold text-[10px] text-zinc-700">
+                        {inv.vendorName.charAt(0)}
+                      </div>
+                      <span className="font-medium text-zinc-900">
+                        {inv.vendorName}
+                      </span>
                     </div>
                   </td>
 
-                  {/* Description Preview */}
-                  <td className="px-4 py-3.5 max-w-[240px] truncate text-zinc-500">
-                    {inv.description || "—"}
+                  {/* Category / Scope */}
+                  <td className="px-4 py-3.5 max-w-[200px] truncate text-zinc-500">
+                    {inv.vendorCategory || inv.description || "General expense"}
                   </td>
 
                   {/* Amount */}
                   <td className="px-4 py-3.5 text-right whitespace-nowrap">
-                    <span className="font-medium text-zinc-900">
+                    <span className="font-mono-nums font-semibold text-zinc-950 text-sm">
                       ${inv.amount.toFixed(2)}
                     </span>{" "}
-                    <span className="text-[11px] text-zinc-400">{inv.currency}</span>
+                    <span className="text-[10px] font-mono text-zinc-400">
+                      {inv.currency}
+                    </span>
                   </td>
 
-                  {/* Date */}
-                  <td className="px-4 py-3.5 whitespace-nowrap text-zinc-500">
+                  {/* Billing Date */}
+                  <td className="px-4 py-3.5 whitespace-nowrap text-zinc-500 font-mono-nums">
                     {new Date(inv.invoiceDate).toLocaleDateString("en-US", {
                       month: "short",
                       day: "numeric",
@@ -130,9 +157,11 @@ export function InvoiceTable({
                           type="button"
                           disabled={isUpdating}
                           onClick={(e) => onQuickApprove(inv.id, e)}
-                          className="px-2.5 py-1 rounded text-xs font-medium bg-zinc-900 text-white hover:bg-zinc-800 transition-colors disabled:opacity-50 cursor-pointer"
+                          title="Approve Invoice"
+                          className="flex items-center gap-1 px-2 py-1 rounded text-xs font-medium bg-zinc-900 hover:bg-zinc-800 text-white transition-all disabled:opacity-40 cursor-pointer shadow-2xs"
                         >
-                          Approve
+                          <Check className="w-3 h-3 text-emerald-400" />
+                          <span>Approve</span>
                         </button>
                       )}
 
@@ -141,18 +170,21 @@ export function InvoiceTable({
                           type="button"
                           disabled={isUpdating}
                           onClick={(e) => onQuickReject(inv.id, e)}
-                          className="px-2.5 py-1 rounded text-xs font-medium border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50 transition-colors disabled:opacity-50 cursor-pointer"
+                          title="Reject Invoice"
+                          className="flex items-center gap-1 px-2 py-1 rounded text-xs font-medium border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700 hover:text-rose-700 transition-all disabled:opacity-40 cursor-pointer shadow-2xs"
                         >
-                          Reject
+                          <X className="w-3 h-3 text-rose-500" />
+                          <span>Reject</span>
                         </button>
                       )}
 
                       <button
                         type="button"
                         onClick={() => onSelectInvoice(inv)}
-                        className="px-2.5 py-1 rounded text-xs font-medium text-zinc-500 hover:text-zinc-900 transition-colors cursor-pointer"
+                        className="p-1 rounded text-zinc-400 hover:text-zinc-900 transition-colors cursor-pointer"
+                        title="View Details"
                       >
-                        View
+                        <ArrowUpRight className="w-4 h-4" />
                       </button>
                     </div>
                   </td>

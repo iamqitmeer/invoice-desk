@@ -13,7 +13,7 @@ import { InvoiceTable } from "@/components/InvoiceTable";
 import { InvoiceDetailModal } from "@/components/InvoiceDetailModal";
 import { DuplicateCompareModal } from "@/components/DuplicateCompareModal";
 import { ToastContainer, ToastMessage } from "@/components/Toast";
-import { RotateCcw } from "lucide-react";
+import { RefreshCw } from "lucide-react";
 
 export default function InvoiceDeskPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -126,7 +126,7 @@ export default function InvoiceDeskPage() {
         body: JSON.stringify({
           status: newStatus,
           reviewNote: reviewNote || undefined,
-          reviewedBy: "Reviewer",
+          reviewedBy: "Sledge Operations Lead",
         }),
       });
 
@@ -136,8 +136,8 @@ export default function InvoiceDeskPage() {
         const updatedInvoice: Invoice = result.data;
         addToast(
           "success",
-          `Invoice updated to ${newStatus}`,
-          `${updatedInvoice.invoiceNumber} status saved to database.`
+          `Status updated: ${newStatus}`,
+          `Invoice ${updatedInvoice.invoiceNumber} persisted to database.`
         );
 
         setInvoices((prev) =>
@@ -209,7 +209,7 @@ export default function InvoiceDeskPage() {
       const res = await fetch("/api/invoices/reset", { method: "POST" });
       const data = await res.json();
       if (data.success) {
-        addToast("success", "Database reset", "Restored 6 seed sample invoices.");
+        addToast("success", "Database Reset", "Restored 6 canonical sample invoices.");
         fetchInvoices();
         setIsDetailOpen(false);
         setIsCompareOpen(false);
@@ -225,7 +225,7 @@ export default function InvoiceDeskPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-zinc-50 text-zinc-900">
+    <div className="min-h-screen flex flex-col bg-[#fafafa] text-zinc-900">
       {/* Header */}
       <Header
         onResetSeed={handleResetSeed}
@@ -234,20 +234,20 @@ export default function InvoiceDeskPage() {
         onSearchChange={setSearchQuery}
       />
 
-      {/* Main Content */}
-      <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6">
-        {/* Stats */}
+      {/* Main Container */}
+      <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-7 space-y-6">
+        {/* Metrics Grid */}
         <StatsCards stats={stats} loading={loading && !stats} />
 
-        {/* Invoices List Section */}
+        {/* Workspace Invoices Section */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
-              <h2 className="text-base font-semibold text-zinc-900">
-                Invoices
+              <h2 className="text-base font-bold text-zinc-950 tracking-tight">
+                Approval Queue
               </h2>
-              <p className="text-xs text-zinc-500">
-                Review and update status for incoming vendor invoices.
+              <p className="text-xs text-zinc-500 mt-0.5">
+                Inspect incoming contractor &amp; SaaS billing statements, cross-verify duplicates, and persist decisions.
               </p>
             </div>
 
@@ -258,16 +258,16 @@ export default function InvoiceDeskPage() {
                 fetchInvoices();
               }}
               disabled={loading}
-              title="Refresh"
-              className="p-1.5 rounded-md border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-500 transition-colors cursor-pointer"
+              title="Refresh queue"
+              className="p-1.5 rounded-md border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-500 hover:text-zinc-900 transition-colors cursor-pointer shadow-2xs self-start sm:self-auto"
             >
-              <RotateCcw
+              <RefreshCw
                 className={`w-3.5 h-3.5 ${loading ? "animate-spin text-zinc-900" : ""}`}
               />
             </button>
           </div>
 
-          {/* Tabs */}
+          {/* Segmented Filter Tabs */}
           <TabNav
             activeTab={activeTab}
             onTabChange={setActiveTab}
@@ -276,7 +276,7 @@ export default function InvoiceDeskPage() {
             onToggleDuplicateFilter={() => setDuplicateFilter(!duplicateFilter)}
           />
 
-          {/* Table */}
+          {/* Table Container */}
           <InvoiceTable
             invoices={invoices}
             loading={loading}
@@ -290,14 +290,17 @@ export default function InvoiceDeskPage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-zinc-200 bg-white py-4 mt-auto">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between text-xs text-zinc-400">
-          <div>Invoice Approval Desk • Sledge Engineering</div>
-          <div>Persisted PostgreSQL / TypeScript API</div>
+      <footer className="border-t border-zinc-200/80 bg-white py-5 mt-auto">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-zinc-400">
+          <div className="flex items-center gap-2 font-mono text-[11px]">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <span>Sledge Desk • TypeScript API + Database Status Persistence</span>
+          </div>
+          <div className="text-[11px]">Submission by Muhammad Qitmeer</div>
         </div>
       </footer>
 
-      {/* Invoice Detail Modal */}
+      {/* Detail Slide-over / Modal */}
       <InvoiceDetailModal
         invoice={selectedInvoice}
         isOpen={isDetailOpen}
@@ -307,7 +310,7 @@ export default function InvoiceDeskPage() {
         isUpdating={isUpdating}
       />
 
-      {/* Duplicate Comparison Modal */}
+      {/* Duplicate Comparison Side-by-Side Modal */}
       <DuplicateCompareModal
         isOpen={isCompareOpen}
         onClose={() => setIsCompareOpen(false)}
